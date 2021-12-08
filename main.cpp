@@ -36,6 +36,11 @@ public:
         temp << std::put_time(&creationDate, "%d/%m/%Y");
         return temp.str();
     }
+
+    std::time_t getDuration()
+    {
+        return duration;
+    }
 };
 
 class Player
@@ -95,6 +100,7 @@ public:
     void next()
     {
         currentSong++;
+        this->play();
     }
 };
 
