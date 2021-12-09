@@ -2,6 +2,7 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
 
 class Track
 {
@@ -46,9 +47,10 @@ public:
 class Player
 {
 private:
-    int qty=0, currentSong;
+    int qty=0, currentSong=0;
     int storageCapacity=8;
     Track* songs=new Track[storageCapacity];
+    bool isPaused=false, isStopped=true;
 public:
     Player(Track* songs, int qty)
     {
@@ -94,14 +96,47 @@ public:
 
     void play()
     {
-        std::cout << (songs+currentSong)->getTrackname() << " " << (songs+currentSong)->getCreationDate() << std::endl;
+        if(isPaused)
+        {
+            isPaused = false;
+            std::cout << (songs + currentSong)->getTrackname() << " resumed\n";
+        }
+        else if(qty!=0&&isStopped)
+        {
+            currentSong = rand()%qty;
+            std::cout << (songs + currentSong)->getTrackname() << " " << (songs + currentSong)->getCreationDate() << std::endl;
+            isStopped=false;
+        }
+    }
+
+    void pause()
+    {
+        if(!isPaused&&qty!=0)
+        {
+            isPaused=true;
+            std::cout << (songs + currentSong)->getTrackname() << " paused\n";
+        }
     }
 
     void next()
     {
-        currentSong++;
+        if(isPaused||isStopped)
+        {
+            isPaused = false;
+            isStopped = true;
+        }
+
         this->play();
     }
+
+    void stop()
+    {
+        if(!isStopped&&qty!=0)
+        {
+            std::cout << (songs+currentSong)->getTrackname() << " stopped\n";
+        }
+    }
+
 };
 
 int main()
@@ -138,11 +173,21 @@ int main()
     for(int i=0;i<10;i++)
         sony.add(songs[i]);
 
-    for(int i=0;i<10;i++)
+    std::string input;
+    do
     {
-        sony.play();
-        sony.next();
+        std::cout << "Input command: ";
+        std::cin >> input;
+        if(input=="play")
+            sony.play();
+        else if (input=="pause")
+            sony.pause();
+        else if(input=="next")
+            sony.next();
+        else if(input=="stop")
+            sony.stop();
     }
+    while(input!="exit");
 
     return 0;
 }
